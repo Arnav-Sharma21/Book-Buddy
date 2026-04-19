@@ -124,6 +124,8 @@ export default function BookClub() {
       const snap = await getDoc(ref)
       if (!snap.exists()) { toast.error('Club not found! The link may be invalid.'); return }
       const data = snap.data()
+      // Clear the ?join= param from the URL so refresh doesn't re-trigger
+      navigate('/bookclubs', { replace: true })
       if (data.memberIds?.includes(user.uid)) {
         toast.info('You are already in this club!')
         setActiveClub({ id: snap.id, ...data })
@@ -134,7 +136,10 @@ export default function BookClub() {
         memberIds: arrayUnion(user.uid),
         members: arrayUnion({ uid: user.uid, name: user.displayName || user.email, joinedAt: new Date().toISOString() }),
       })
-      toast.success(`Joined "${data.name}"!`)
+      toast.success(`Joined "${data.name}"! Opening club…`)
+      // Auto-open the club after joining
+      setActiveClub({ id: snap.id, ...data })
+      setView('club')
     } catch (e) {
       toast.error('Could not join club.')
     }
