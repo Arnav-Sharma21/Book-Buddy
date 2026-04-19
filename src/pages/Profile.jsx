@@ -21,6 +21,11 @@ const DOODLE_AVATARS = [
   { id: 'wizard',      src: '/avatars/av_wizard.jpg',      label: 'Wizard',       rot: 5,   ty: -4  },
   { id: 'buffcat',     src: '/avatars/av_buffcat.jpg',     label: 'Buff Cat',     rot: -3,  ty: 4   },
   { id: 'businesscat', src: '/avatars/av_businesscat.jpg', label: 'Business Cat', rot: 2,   ty: -6  },
+  { id: 'firespirit',  src: '/avatars/av_firespirit.png',  label: 'Fire Spirit',  rot: -5,  ty: 2   },
+  { id: 'frenchduck',  src: '/avatars/av_frenchduck.png',  label: 'French Duck',  rot: 4,   ty: -8  },
+  { id: 'jellyfish',   src: '/avatars/av_jellyfish.png',   label: 'Jellyfish',    rot: -2,  ty: 5   },
+  { id: 'sprout',      src: '/avatars/av_sprout.png',      label: 'Sprout',       rot: 3,   ty: -3  },
+  { id: 'skaterdino',  src: '/avatars/av_skaterdino.png',  label: 'Skater Dino',  rot: -4,  ty: 7   },
 ]
 
 const GENRE_OPTIONS = [
