@@ -146,7 +146,7 @@ export default function Login() {
 
             <p style={{ textAlign:'center', fontFamily:'var(--font-study)', fontSize:'1.05rem', color:'var(--color-pencil)' }}>
               No notebook yet?{' '}
-              <Link to="/register" style={{ fontFamily:'var(--font-sketch)', fontSize:'1.15rem', fontWeight:700, color:'var(--color-ink)', textDecoration:'none', borderBottom:'2.5px solid var(--color-ink)', paddingBottom:'1px' }}>
+              <Link to="/register" state={{ from: location.state?.from }} style={{ fontFamily:'var(--font-sketch)', fontSize:'1.15rem', fontWeight:700, color:'var(--color-ink)', textDecoration:'none', borderBottom:'2.5px solid var(--color-ink)', paddingBottom:'1px' }}>
                 Create one
               </Link>
             </p>

@@ -147,7 +147,7 @@ export default function Register() {
 
             <p style={{ textAlign:'center', fontFamily:'var(--font-study)', fontSize:'1.05rem', color:'var(--color-pencil)' }}>
               Already have one?{' '}
-              <Link to="/login" style={{ fontFamily:'var(--font-sketch)', fontSize:'1.15rem', fontWeight:700, color:'var(--color-ink)', textDecoration:'none', borderBottom:'2.5px solid var(--color-ink)', paddingBottom:'1px' }}>
+              <Link to="/login" state={{ from: location.state?.from }} style={{ fontFamily:'var(--font-sketch)', fontSize:'1.15rem', fontWeight:700, color:'var(--color-ink)', textDecoration:'none', borderBottom:'2.5px solid var(--color-ink)', paddingBottom:'1px' }}>
                 Log in
               </Link>
             </p>
