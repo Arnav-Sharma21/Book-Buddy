@@ -14,6 +14,11 @@ const AVATAR_SRCS = {
   wizard:      '/avatars/av_wizard.jpg',
   buffcat:     '/avatars/av_buffcat.jpg',
   businesscat: '/avatars/av_businesscat.jpg',
+  firespirit:  '/avatars/av_firespirit.png',
+  frenchduck:  '/avatars/av_frenchduck.png',
+  jellyfish:   '/avatars/av_jellyfish.png',
+  sprout:      '/avatars/av_sprout.png',
+  skaterdino:  '/avatars/av_skaterdino.png',
 }
 
 const links = [
