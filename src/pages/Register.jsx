@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { motion } from 'framer-motion'
@@ -66,6 +66,8 @@ export default function Register() {
   const [confirm,  setConfirm]  = useState('')
   const [loading,  setLoading]  = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from || { pathname: '/dashboard' }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -81,7 +83,7 @@ export default function Register() {
         createdAt: new Date().toISOString(), preferredGenres: [],
       })
       toast.success('Notebook created!')
-      navigate('/dashboard')
+      navigate(from.pathname + (from.search || ''), { replace: true })
     } catch (err) {
       toast.error(err.message)
     } finally { setLoading(false) }

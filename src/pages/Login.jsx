@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { motion } from 'framer-motion'
 import rough from 'roughjs'
@@ -66,6 +66,8 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from || { pathname: '/dashboard' }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -73,7 +75,7 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       toast.success('Welcome back!')
-      navigate('/dashboard')
+      navigate(from.pathname + (from.search || ''), { replace: true })
     } catch {
       toast.error('Wrong email or password')
     } finally { setLoading(false) }
