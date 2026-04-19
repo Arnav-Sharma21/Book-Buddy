@@ -42,31 +42,62 @@ export default function BookCard({ book, index = 0 }) {
     ? Math.min(100, Math.round(((book.currentPage || 0) / book.totalPages) * 100))
     : 0
 
-  // Base shadow consistent across all statuses
-  const baseShadow = '4px 4px 0 var(--color-ink)'
-  const hoverShadow = '8px 8px 0 var(--color-ink)'
+  // Layered book shadow: soft blur + mid diffuse + hard ink offset
+  const baseShadow = [
+    '0 2px 4px rgba(0,0,0,0.08)',
+    '0 6px 16px rgba(0,0,0,0.13)',
+    '4px 6px 0 var(--color-ink)',
+  ].join(', ')
+
+  const hoverShadow = [
+    '0 4px 8px rgba(0,0,0,0.10)',
+    '0 14px 32px rgba(0,0,0,0.18)',
+    '8px 12px 0 var(--color-ink)',
+  ].join(', ')
 
   return (
     <motion.div
       layout
-      initial={{ opacity:0, y:24, rotate: rotate - 4, boxShadow: baseShadow }}
-      animate={{ opacity:1, y:0, rotate, boxShadow: baseShadow }}
+      initial={{ opacity:0, y:24, rotate: rotate - 4 }}
+      animate={{ opacity:1, y:0, rotate }}
       exit={{ opacity:0, scale:0.82, rotate: rotate + 5 }}
       whileHover={{
         rotate: 0,
         scale: 1.06,
+        y: -6,
         zIndex: 20,
         boxShadow: hoverShadow,
-        transition: { duration: 0.15 },
+        transition: { type:'spring', stiffness:320, damping:22 },
       }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.97, y: 0 }}
       transition={{ type:'spring', stiffness:260, damping:22 }}
       style={{
         transformOrigin: 'center bottom',
         borderRadius: '8px 20px 10px 16px / 16px 10px 20px 8px',
-        // The shadow lives HERE on the wrapper, not on the inner div
+        boxShadow: baseShadow,
+        position: 'relative',
       }}
     >
+      {/* Stacked pages illusion — two thin strips peeking out at the bottom */}
+      <div style={{
+        position: 'absolute', bottom: -4, left: 6, right: 6, height: 6,
+        background: 'var(--color-paper-worn)',
+        borderRadius: '0 0 6px 6px',
+        border: '1.5px solid var(--color-ink)',
+        borderTop: 'none',
+        zIndex: -1,
+        opacity: 0.7,
+      }}/>
+      <div style={{
+        position: 'absolute', bottom: -7, left: 10, right: 10, height: 5,
+        background: 'var(--color-paper-dark)',
+        borderRadius: '0 0 5px 5px',
+        border: '1.5px solid var(--color-ink)',
+        borderTop: 'none',
+        zIndex: -2,
+        opacity: 0.45,
+      }}/>
+
       <Link to={`/book/${book.id}`} style={{ textDecoration:'none', display:'block' }}>
         <div style={{
           background: 'var(--color-paper)',
@@ -75,20 +106,31 @@ export default function BookCard({ book, index = 0 }) {
           overflow: 'hidden',
           position: 'relative',
         }}>
+          {/* Book spine left-edge highlight */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, bottom: 0, width: 5,
+            background: 'linear-gradient(to right, rgba(255,255,255,0.22), transparent)',
+            zIndex: 2, pointerEvents: 'none',
+          }}/>
           <DogEar/>
 
           {/* Cover image or cross-hatch placeholder */}
           {book.coverUrl ? (
             <div style={{ height:'10.5rem', overflow:'hidden',
-              borderBottom:'2px solid var(--color-ink)' }}>
+              borderBottom:'2px solid var(--color-ink)', position:'relative' }}>
               <img src={book.coverUrl} alt={book.title} loading="lazy"
                 style={{ width:'100%', height:'100%', objectFit:'cover', display:'block',
-                  filter:'grayscale(20%) contrast(1.05)',
-                  transition:'transform 0.35s ease',
+                  filter:'contrast(1.08) saturate(1.1)',
+                  transition:'transform 0.38s ease',
                 }}
-                onMouseEnter={e => e.target.style.transform='scale(1.07)'}
+                onMouseEnter={e => e.target.style.transform='scale(1.08)'}
                 onMouseLeave={e => e.target.style.transform='scale(1)'}
               />
+              {/* Vignette overlay for depth */}
+              <div style={{
+                position:'absolute', inset:0, pointerEvents:'none',
+                background:'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.28) 100%)',
+              }}/>
             </div>
           ) : (
             <div style={{
