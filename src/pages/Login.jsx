@@ -13,27 +13,44 @@ function RoughCard({ children }) {
   const containerRef = useRef(null)
   const svgRef       = useRef(null)
   const [dims, setDims] = useState({ w:0, h:0 })
+  const dimsRef = useRef({ w:0, h:0 })
 
+  // Shared draw function — reads current CSS vars each time it runs
+  const redraw = () => {
+    const svg = svgRef.current
+    const d = dimsRef.current
+    if (!svg || d.w < 4) return
+    while (svg.firstChild) svg.removeChild(svg.firstChild)
+    const rc = rough.svg(svg)
+    const style = getComputedStyle(document.documentElement)
+    const inkColor   = style.getPropertyValue('--color-ink').trim()   || '#1a1a1a'
+    const paperColor = style.getPropertyValue('--color-paper').trim() || '#f8f5ee'
+    svg.appendChild(rc.rectangle(4, 4, d.w-8, d.h-8, {
+      roughness:1.2, strokeWidth:2.5, stroke:inkColor, fill:paperColor, fillStyle:'solid', bowing:0.9,
+    }))
+  }
+
+  // Watch card size
   useEffect(() => {
-    const ro = new ResizeObserver(([e]) =>
-      setDims({ w:Math.round(e.contentRect.width), h:Math.round(e.contentRect.height) }))
+    const ro = new ResizeObserver(([e]) => {
+      const w = Math.round(e.contentRect.width)
+      const h = Math.round(e.contentRect.height)
+      dimsRef.current = { w, h }
+      setDims({ w, h })
+    })
     ro.observe(containerRef.current)
     return () => ro.disconnect()
   }, [])
 
+  // Redraw when dims change
+  useEffect(() => { redraw() }, [dims])
+
+  // Redraw when theme changes (data-theme attribute on <html>)
   useEffect(() => {
-    const svg = svgRef.current
-    if (!svg || dims.w < 4) return
-    while (svg.firstChild) svg.removeChild(svg.firstChild)
-    const rc = rough.svg(svg)
-    // Read theme-aware colors from CSS variables at draw time
-    const style = getComputedStyle(document.documentElement)
-    const inkColor   = style.getPropertyValue('--color-ink').trim()   || '#1a1a1a'
-    const paperColor = style.getPropertyValue('--color-paper').trim() || '#f8f5ee'
-    svg.appendChild(rc.rectangle(4, 4, dims.w-8, dims.h-8, {
-      roughness:1.2, strokeWidth:2.5, stroke:inkColor, fill:paperColor, fillStyle:'solid', bowing:0.9,
-    }))
-  }, [dims])
+    const mo = new MutationObserver(() => redraw())
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => mo.disconnect()
+  }, [])
 
   return (
     <div ref={containerRef} style={{ position:'relative', width:'100%', maxWidth:440, boxShadow:'7px 7px 0 var(--color-ink)' }}>
