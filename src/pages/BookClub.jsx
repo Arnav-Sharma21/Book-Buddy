@@ -141,9 +141,15 @@ export default function BookClub() {
       setActiveClub({ id: snap.id, ...data })
       setView('club')
     } catch (e) {
-      toast.error('Could not join club.')
+      console.error('BookClub join error:', e)
+      if (e.code === 'permission-denied') {
+        toast.error('Join failed: Firestore rules are blocking the request. Please update your Firebase security rules.')
+      } else {
+        toast.error(`Could not join club: ${e.message || e.code || 'Unknown error'}`)
+      }
     }
   }
+
 
   const handleCreateClub = async ({ name, bookTitle, bookAuthor, description }) => {
     try {
