@@ -216,6 +216,9 @@ export default function Dashboard() {
         setRecs(recs)
         setRecsLoading(false)
       }
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
     })
   }, [user.uid])
 

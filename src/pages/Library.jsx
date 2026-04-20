@@ -207,7 +207,13 @@ export default function Library() {
   const [search, setSearch]   = useState('')
   const [showModal, setModal] = useState(false)
 
-  const load = () => getUserBooks(user.uid).then(b => { setBooks(b); setLoading(false) })
+  const load = () => getUserBooks(user.uid)
+    .then(b => { setBooks(b); setLoading(false) })
+    .catch(err => {
+      console.error(err);
+      toast.error('Books error: ' + err.message);
+      setLoading(false);
+    })
   useEffect(() => { load() }, [user.uid])
 
   const handleAdd    = async (data) => { await addBook(user.uid, data); await load() }
