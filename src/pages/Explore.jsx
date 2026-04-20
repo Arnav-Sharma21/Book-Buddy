@@ -37,8 +37,15 @@ async function searchGoogleBooks(query, startIndex = 0, maxResults = 20) {
   }
 
   try {
-    const res = await fetch(`${GBOOKS}?${params}`)
+    let res = await fetch(`${GBOOKS}?${params}`)
     
+    // Fallback: If the API key is problematic (503/403), try once without it
+    if ((res.status === 503 || res.status === 403) && params.has('key')) {
+      console.warn(`Google Books API returned ${res.status} with key. Retrying without key...`)
+      params.delete('key')
+      res = await fetch(`${GBOOKS}?${params}`)
+    }
+
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
       console.error('Google Books API Error:', body)
