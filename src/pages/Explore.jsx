@@ -21,26 +21,38 @@ async function searchGoogleBooks(query, startIndex = 0, maxResults = 20) {
 
   const key = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
+  // Clean the query a bit
+  const cleanQuery = query.trim()
+
   const params = new URLSearchParams({
-    q: String(query),
+    q: cleanQuery,
     startIndex: String(startIndex),
     maxResults: String(maxResults),
     printType: 'books',
-    langRestrict: 'en',
+    // langRestrict: 'en', // Removing this temporarily to See if it helps results
   })
 
-  if (key && key !== 'undefined') {
+  if (key && key !== 'undefined' && key.length > 5) {
     params.append('key', key)
   }
 
-  const res = await fetch(`${GBOOKS}?${params}`)
+  try {
+    const res = await fetch(`${GBOOKS}?${params}`)
+    
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      console.error('Google Books API Error:', body)
+      // Specific handling for quota or key errors
+      if (res.status === 403) throw new Error('API Key issue or Quota exceeded. Check if Books API is enabled.')
+      if (res.status === 429) throw new Error('Too many requests. Please wait a moment.')
+      throw new Error(body?.error?.message || `Error ${res.status}: ${res.statusText}`)
+    }
 
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error(body?.error?.message || `HTTP ${res.status}`)
+    return res.json()
+  } catch (err) {
+    console.error('Fetch failed:', err)
+    throw err
   }
-
-  return res.json()
 }
 
 function parseBook(item) {
@@ -49,7 +61,7 @@ function parseBook(item) {
     id: item.id,
     title: v.title || 'Untitled',
     author: (v.authors || ['Unknown']).join(', '),
-    cover: v.imageLinks?.thumbnail?.replace('http:', 'https:') || null,
+    cover: (v.imageLinks?.thumbnail || v.imageLinks?.smallThumbnail)?.replace('http:', 'https:') || null,
     pages: v.pageCount || 0,
     genres: (v.categories || []).map(c => c.split(' / ')[0].toLowerCase()),
     description: v.description || '',
@@ -394,10 +406,17 @@ export default function Explore() {
     try {
       const data = await searchGoogleBooks(q, startIndex ?? 0, MAX)
       const books = (data.items || []).map(parseBook)
-      setResults(prev => (append ? [...prev, ...books] : books))
-      setTotal(Math.min(data.totalItems || 0, 200))
+      
+      if (books.length === 0 && !append) {
+        setResults([])
+        setTotal(0)
+      } else {
+        setResults(prev => (append ? [...prev, ...books] : books))
+        setTotal(Math.min(data.totalItems || 0, 400)) // Allowing up to 400 results
+      }
     } catch (e) {
-      setError(e.message || 'Could not reach Google Books. Try again.')
+      console.error('Explore Fetch Error:', e)
+      setError(e.message || 'Could not reach Google Books. Please check your connection or API key.')
     } finally {
       setLoading(false)
     }
@@ -533,6 +552,7 @@ export default function Explore() {
 
         <motion.button
           type="submit"
+          disabled={loading}
           className="btn-scribble"
           style={{
             background: 'var(--color-ink)',
@@ -542,11 +562,13 @@ export default function Explore() {
             fontWeight: 700,
             whiteSpace: 'nowrap',
             padding: '0.65rem 1.4rem',
+            opacity: loading ? 0.7 : 1,
+            cursor: loading ? 'not-allowed' : 'pointer',
           }}
-          whileHover={{ y: -2, boxShadow: '6px 6px 0 var(--color-ink)' }}
-          whileTap={{ y: 1, boxShadow: '2px 2px 0 var(--color-ink)' }}
+          whileHover={!loading ? { y: -2, boxShadow: '6px 6px 0 var(--color-ink)' } : {}}
+          whileTap={!loading ? { y: 1, boxShadow: '2px 2px 0 var(--color-ink)' } : {}}
         >
-          Search →
+          {loading ? 'Searching…' : 'Search →'}
         </motion.button>
       </motion.form>
 
@@ -660,10 +682,11 @@ export default function Explore() {
               marginBottom: '0.4rem',
             }}
           >
-            Nothing found
+            No matches found
           </h3>
           <p style={{ fontFamily: 'var(--font-study)', color: 'var(--color-pencil)' }}>
-            Try different keywords or a genre chip above.
+            We couldn't find any books for &ldquo;{query}&rdquo;. <br/>
+            Try checking for typos or using broader keywords.
           </p>
         </motion.div>
       )}
