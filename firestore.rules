@@ -9,20 +9,20 @@ service cloud.firestore {
 
     // Books are private per user
     match /books/{bookId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create:      if request.auth != null;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create:               if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     // Quotes are private per user
     match /quotes/{quoteId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create:      if request.auth != null;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create:               if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     // Word notes are private per user
     match /wordNotes/{noteId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create:      if request.auth != null;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create:               if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     // Book clubs — any authenticated user can READ or JOIN (update memberIds)

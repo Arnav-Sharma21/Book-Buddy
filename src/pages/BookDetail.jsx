@@ -22,7 +22,7 @@ import { Star, Arrow, Zigzag } from '../components/ui/DoodleDecor'
 import {
   PencilIcon, TrashIcon, BarChartIcon, StarFilledIcon,
   BookOpenIcon, TextIcon, MapPinIcon, SaveIcon,
-  CheckCircleIcon, ClipboardIcon, CloseIcon
+  CheckCircleIcon, ClipboardIcon, CloseIcon, SparkleIcon
 } from '../components/ui/DoodleIcons'
 
 /* ── Status badge config ── */
@@ -144,7 +144,7 @@ function DeleteButton({ onConfirm }) {
 }
 
 /* ── Book shelf — four DoodleBook cards ── */
-function BookShelf({ bookId, onOpenQuotes, onOpenWords, onOpenWordNote, onOpenNearby }) {
+function BookShelf({ bookId, onOpenQuotes, onOpenWords, onOpenWordNote, onOpenLoreNote, onOpenNearby }) {
   const { quotes }    = useQuotes(bookId)
   const { wordNotes } = useWordNotes(bookId)
 
@@ -164,6 +164,7 @@ function BookShelf({ bookId, onOpenQuotes, onOpenWords, onOpenWordNote, onOpenNe
       icon:<PencilIcon size={40} strokeWidth={1.2}/>, count: null,
       onClick: onOpenWordNote, delay:0.4,
     },
+
     {
       title:'Nearby Stores', subtitle:'Find bookshops', color:'#fce7f3',
       icon:<MapPinIcon size={40} strokeWidth={1.2}/>, count: null,
@@ -197,19 +198,7 @@ function BookShelf({ bookId, onOpenQuotes, onOpenWords, onOpenWordNote, onOpenNe
           ))}
         </div>
 
-        {/* Wooden shelf plank */}
-        <div style={{
-          height:18,
-          background:'linear-gradient(180deg, #c8a96e 0%, #a87f4a 60%, #8a6535 100%)',
-          borderTop:'2.5px solid var(--color-ink)',
-          borderRadius:'0 0 4px 4px',
-          boxShadow:'0 4px 12px rgba(0,0,0,0.22)',
-          marginTop:0,
-        }}/>
-        {/* Shelf shadow */}
-        <div style={{ height:8,
-          background:'linear-gradient(180deg, rgba(0,0,0,0.12), transparent)',
-          marginTop:0 }}/>
+
       </div>
     </motion.div>
   )
@@ -261,6 +250,7 @@ export default function BookDetail() {
   const [showQuotes, setShowQuotes] = useState(false)
   const [showWords, setShowWords]   = useState(false)
   const [showWordModal, setShowWordModal] = useState(false)
+  const [wordModalTags, setWordModalTags] = useState([])
   const [showNearby, setShowNearby] = useState(false)
   const [showEdit, setShowEdit]     = useState(false)
 
@@ -518,7 +508,8 @@ export default function BookDetail() {
         bookId={bookId}
         onOpenQuotes={() => setShowQuotes(true)}
         onOpenWords={()  => setShowWords(true)}
-        onOpenWordNote={() => setShowWordModal(true)}
+        onOpenWordNote={() => { setWordModalTags([]); setShowWordModal(true) }}
+        onOpenLoreNote={() => { setWordModalTags(['lore']); setShowWordModal(true) }}
         onOpenNearby={() => setShowNearby(true)}
       />
 
@@ -530,7 +521,13 @@ export default function BookDetail() {
             onOpenModal={() => { setShowWords(false); setShowWordModal(true) }}
             onClose={() => setShowWords(false)}/>
         )}
-        {showWordModal && <WordModal bookId={bookId} onClose={() => setShowWordModal(false)}/>}
+        {showWordModal && (
+          <WordModal
+            bookId={bookId}
+            initialTags={wordModalTags}
+            onClose={() => setShowWordModal(false)}
+          />
+        )}
         {showNearby && <NearbyStores onClose={() => setShowNearby(false)}/>}
         {showEdit && (
           <BookForm initial={book} onSubmit={handleEditSave}

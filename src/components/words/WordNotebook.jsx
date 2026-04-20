@@ -14,8 +14,10 @@ export default function WordNotebook({ bookId, onOpenModal, onClose }) {
   const [search, setSearch] = useState('')
 
   const filtered = wordNotes.filter(n => {
-    const tagMatch    = tag === 'all' || n.tags?.includes(tag)
-    const searchMatch = !search || n.word.toLowerCase().includes(search.toLowerCase())
+    const tags = n.tags || []
+    const word = n.word || ''
+    const tagMatch    = tag === 'all' || tags.includes(tag)
+    const searchMatch = !search || word.toLowerCase().includes(search.toLowerCase())
     return tagMatch && searchMatch
   })
 

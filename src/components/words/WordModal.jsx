@@ -9,11 +9,11 @@ import { TextIcon, BookmarkIcon, SearchIcon } from '../ui/DoodleIcons'
 
 const TAGS = ['vocab', 'lore', 'technical', 'character', 'place']
 
-export default function WordModal({ bookId, prefill = '', onClose }) {
+export default function WordModal({ bookId, prefill = '', initialTags = [], onClose }) {
   const { user }    = useAuth()
   const [word, setWord]           = useState(prefill)
   const [definition, setDefinition] = useState(null)
-  const [form, setForm]           = useState({ shortMeaning:'', example:'', tags:[] })
+  const [form, setForm]           = useState({ shortMeaning:'', example:'', tags: initialTags })
   const [fetching, setFetching]   = useState(false)
 
   const handleFetch = async () => {

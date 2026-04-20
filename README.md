@@ -9,6 +9,12 @@
 
 ---
 
+## 🎬 Demo
+
+[▶ Watch Screen Recording](https://drive.google.com/your-link-here)
+
+---
+
 ## 🧩 Problem Statement
 
 Avid readers juggle multiple apps — one to track books, another to save quotes, another to find bookshops, and a spreadsheet for vocabulary. There is no single space that feels personal, tactile, and alive like a real reading journal.

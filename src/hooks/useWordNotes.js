@@ -17,9 +17,10 @@ export function useWordNotes(bookId) {
     setLoading(true)
     try {
       const data = await getBookWords(user.uid, bookId)
-      setWordNotes(data.sort((a, b) => a.createdAt?.seconds - b.createdAt?.seconds))
-    } catch {
-      toast.error('Could not load word notes.')
+      setWordNotes(data.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0)))
+    } catch (err) {
+      console.error(err)
+      toast.error('Word notes error: ' + err.message)
     } finally {
       setLoading(false)
     }

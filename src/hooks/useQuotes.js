@@ -18,9 +18,10 @@ export function useQuotes(bookId) {
     try {
       const data = await getBookQuotes(user.uid, bookId)
       // Sort oldest first so pages read naturally
-      setQuotes(data.sort((a, b) => a.createdAt?.seconds - b.createdAt?.seconds))
-    } catch {
-      toast.error('Could not load quotes.')
+      setQuotes(data.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0)))
+    } catch (err) {
+      console.error(err)
+      toast.error('Quotes error: ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -53,7 +54,6 @@ export function useQuotes(bookId) {
   return {
     quotes,
     loading,
-    fetchQuotes,
     handleAddQuote,
     handleDeleteQuote,
   }
